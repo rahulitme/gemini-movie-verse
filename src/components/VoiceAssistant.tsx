@@ -24,9 +24,9 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMovieSearch }) => {
     onMessage: (message) => {
       console.log('Voice message:', message);
       // Process voice commands for movie search
-      if (message.type === 'user_transcript' && message.text) {
-        const searchMatch = message.text.toLowerCase().match(/search for (.+)|find (.+)|show me (.+)/);
-        if (searchMatch && onMovieSearch) {
+      if (message.message && onMovieSearch) {
+        const searchMatch = message.message.toLowerCase().match(/search for (.+)|find (.+)|show me (.+)/);
+        if (searchMatch) {
           const query = searchMatch[1] || searchMatch[2] || searchMatch[3];
           onMovieSearch(query);
         }

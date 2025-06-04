@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search, Sparkles, Film, Star, Calendar, Clock, TrendingUp } from 'lucide-react';
 import MovieCard from '../components/MovieCard';
 import MovieDetails from '../components/MovieDetails';
 import AIRecommendations from '../components/AIRecommendations';
 import VoiceAssistant from '../components/VoiceAssistant';
+import ThemeToggle from '../components/ThemeToggle';
 import { Movie } from '../types/movie';
 import { searchMovies, getMovieDetails } from '../services/movieService';
 import { useToast } from '@/hooks/use-toast';
@@ -19,7 +19,6 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Load featured movies on initial load
     loadFeaturedMovies();
   }, []);
 
@@ -109,7 +108,10 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 dark:from-slate-900 dark:via-violet-900 dark:to-purple-900 light:from-violet-50 light:via-purple-50 light:to-fuchsia-50 transition-colors duration-500">
+      {/* Theme Toggle */}
+      <ThemeToggle />
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 backdrop-blur-3xl"></div>
@@ -124,7 +126,7 @@ const Index = () => {
                 CineAI
               </h1>
             </div>
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-300 dark:text-gray-300 light:text-gray-700 mb-8 max-w-2xl mx-auto">
               Discover movies with the power of AI and voice commands. Get personalized recommendations, detailed analysis, and explore the world of cinema.
             </p>
             
@@ -137,7 +139,7 @@ const Index = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search for any movie... or use voice command"
-                  className="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300"
+                  className="w-full pl-12 pr-4 py-4 bg-white/10 dark:bg-white/10 light:bg-white/70 backdrop-blur-md border border-white/20 dark:border-white/20 light:border-violet-200 rounded-2xl text-white dark:text-white light:text-gray-900 placeholder-gray-400 dark:placeholder-gray-400 light:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300"
                 />
                 <button
                   type="submit"
