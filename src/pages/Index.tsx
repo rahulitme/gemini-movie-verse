@@ -108,7 +108,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 dark:from-slate-900 dark:via-violet-900 dark:to-purple-900 light:from-violet-50 light:via-purple-50 light:to-fuchsia-50 transition-colors duration-500">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-violet-900 to-purple-900 dark:from-slate-900 dark:via-violet-900 dark:to-purple-900 light:from-violet-50 light:via-purple-50 light:to-fuchsia-50 light:bg-gradient-to-br transition-colors duration-500">
       {/* Theme Toggle */}
       <ThemeToggle />
 
@@ -139,7 +139,7 @@ const Index = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search for any movie... or use voice command"
-                  className="w-full pl-12 pr-4 py-4 bg-white/10 dark:bg-white/10 light:bg-white/70 backdrop-blur-md border border-white/20 dark:border-white/20 light:border-violet-200 rounded-2xl text-white dark:text-white light:text-gray-900 placeholder-gray-400 dark:placeholder-gray-400 light:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300"
+                  className="w-full pl-12 pr-4 py-4 bg-white/10 dark:bg-white/10 light:bg-white/80 backdrop-blur-md border border-white/20 dark:border-white/20 light:border-violet-200 rounded-2xl text-white dark:text-white light:text-gray-900 placeholder-gray-400 dark:placeholder-gray-400 light:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-300"
                 />
                 <button
                   type="submit"
