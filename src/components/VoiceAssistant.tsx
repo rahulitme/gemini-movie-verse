@@ -98,37 +98,21 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMovieSearch }) => {
         // Request microphone access first
         await navigator.mediaDevices.getUserMedia({ audio: true });
         
-        // Generate signed URL for the conversation
-        const response = await fetch(
-          `https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=your_agent_id`,
-          {
-            method: 'GET',
-            headers: {
-              'xi-api-key': apiKey,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          // If signed URL fails, try with a public agent or fallback
-          console.log('Starting conversation with basic setup...');
-          const id = await conversation.startSession({
-            agentId: 'your_agent_id', // You'll need to replace this with an actual agent ID
-          });
-          setConversationId(id);
-          setIsListening(true);
-        } else {
-          const data = await response.json();
-          const id = await conversation.startSession({
-            url: data.signed_url,
-          });
-          setConversationId(id);
-          setIsListening(true);
-        }
+        // Start conversation with a default agent ID
+        // You may need to replace this with a valid agent ID from your ElevenLabs account
+        const id = await conversation.startSession({
+          agentId: 'bIHbv24MWmeRgasZH58o', // Using Will's voice ID as fallback
+          authorization: apiKey,
+        });
+        setConversationId(id);
+        setIsListening(true);
+        console.log('Conversation started with ID:', id);
       } catch (error) {
         console.error('Error starting conversation:', error);
         if (error.message?.includes('Permission denied')) {
           alert('Microphone access is required for voice commands. Please allow microphone access and try again.');
+        } else if (error.message?.includes('401') || error.message?.includes('authorization')) {
+          alert('Invalid API key. Please check your ElevenLabs API key and try again.');
         } else {
           alert('Failed to start voice assistant. Please check your API key and try again.');
         }
