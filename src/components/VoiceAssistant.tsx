@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { useConversation } from '@11labs/react';
@@ -14,6 +15,9 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMovieSearch }) => {
   });
   const [showApiInput, setShowApiInput] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [agentId, setAgentId] = useState(() => {
+    return localStorage.getItem('elevenlabs_agent_id') || '';
+  });
 
   const conversation = useConversation({
     onConnect: () => {
@@ -76,8 +80,20 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMovieSearch }) => {
     }
   }, [apiKey]);
 
+  useEffect(() => {
+    if (agentId) {
+      localStorage.setItem('elevenlabs_agent_id', agentId);
+    }
+  }, [agentId]);
+
   const toggleListening = async () => {
     if (!apiKey.trim()) {
+      setShowApiInput(true);
+      return;
+    }
+
+    if (!agentId.trim()) {
+      alert('Please enter your ElevenLabs Agent ID. You can find this in your ElevenLabs dashboard under Conversational AI.');
       setShowApiInput(true);
       return;
     }
@@ -97,25 +113,21 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMovieSearch }) => {
         // Request microphone access first
         await navigator.mediaDevices.getUserMedia({ audio: true });
         
-        // Generate signed URL for the conversation
+        // Generate signed URL for the conversation - using GET request with query parameter
         const response = await fetch(
-          'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url',
+          `https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=${agentId}`,
           {
-            method: 'POST',
+            method: 'GET',
             headers: {
               'xi-api-key': apiKey,
-              'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              agent_id: 'your_agent_id' // You'll need to create an agent in ElevenLabs dashboard
-            })
           }
         );
 
         if (!response.ok) {
           const errorData = await response.text();
           console.error('Failed to get signed URL:', errorData);
-          alert('Failed to connect to ElevenLabs. Please check your API key and ensure you have created a Conversational AI agent in your ElevenLabs dashboard.');
+          alert('Failed to connect to ElevenLabs. Please check your API key and Agent ID. Make sure you have created a Conversational AI agent in your ElevenLabs dashboard.');
           return;
         }
 
@@ -135,7 +147,7 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMovieSearch }) => {
         } else if (error.message?.includes('agent')) {
           alert('No Conversational AI agent found. Please create an agent in your ElevenLabs dashboard first.');
         } else {
-          alert('Failed to start voice assistant. Please check your API key and ensure you have created a Conversational AI agent.');
+          alert('Failed to start voice assistant. Please check your API key and Agent ID.');
         }
         setIsListening(false);
       }
@@ -153,11 +165,12 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMovieSearch }) => {
   };
 
   const saveApiKey = () => {
-    if (apiKey.trim()) {
+    if (apiKey.trim() && agentId.trim()) {
       localStorage.setItem('elevenlabs_api_key', apiKey);
+      localStorage.setItem('elevenlabs_agent_id', agentId);
       setShowApiInput(false);
     } else {
-      alert('Please enter a valid API key');
+      alert('Please enter both API key and Agent ID');
     }
   };
 
@@ -169,13 +182,20 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMovieSearch }) => {
             🎤 Voice Assistant Setup
           </h3>
           <p className="text-gray-700 dark:text-gray-300 text-sm mb-4">
-            Enter your ElevenLabs API Key to enable voice commands:
+            Enter your ElevenLabs credentials:
           </p>
           <input
             type="password"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
-            placeholder="sk_..."
+            placeholder="API Key (sk_...)"
+            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-2xl text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 mb-3"
+          />
+          <input
+            type="text"
+            value={agentId}
+            onChange={(e) => setAgentId(e.target.value)}
+            placeholder="Agent ID"
             className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-2xl text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
           />
           <div className="flex gap-3 mt-4">
@@ -193,8 +213,9 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMovieSearch }) => {
             </button>
           </div>
           <div className="text-xs text-gray-500 dark:text-gray-400 mt-3">
-            <p>Your API key is stored locally and never sent to our servers.</p>
-            <p className="mt-2 text-red-500">⚠️ You need to create a Conversational AI agent in your ElevenLabs dashboard first!</p>
+            <p>Your credentials are stored locally and never sent to our servers.</p>
+            <p className="mt-2 text-red-500">⚠️ Create a Conversational AI agent in your ElevenLabs dashboard first!</p>
+            <p className="mt-1 text-blue-500">💡 Find your Agent ID in the ElevenLabs dashboard under Conversational AI.</p>
           </div>
         </div>
       )}
