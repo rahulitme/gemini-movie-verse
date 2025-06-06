@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { useConversation } from '@11labs/react';
@@ -98,11 +97,31 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMovieSearch }) => {
         // Request microphone access first
         await navigator.mediaDevices.getUserMedia({ audio: true });
         
-        // Start conversation with a default agent ID
-        // You may need to replace this with a valid agent ID from your ElevenLabs account
+        // Generate signed URL for the conversation
+        const response = await fetch(
+          'https://api.elevenlabs.io/v1/convai/conversation/get_signed_url',
+          {
+            method: 'POST',
+            headers: {
+              'xi-api-key': apiKey,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              agent_id: 'your_agent_id' // You'll need to create an agent in ElevenLabs dashboard
+            })
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.text();
+          console.error('Failed to get signed URL:', errorData);
+          alert('Failed to connect to ElevenLabs. Please check your API key and ensure you have created a Conversational AI agent in your ElevenLabs dashboard.');
+          return;
+        }
+
+        const data = await response.json();
         const id = await conversation.startSession({
-          agentId: 'bIHbv24MWmeRgasZH58o', // Using Will's voice ID as fallback
-          authorization: apiKey,
+          signedUrl: data.signed_url,
         });
         setConversationId(id);
         setIsListening(true);
@@ -113,8 +132,10 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMovieSearch }) => {
           alert('Microphone access is required for voice commands. Please allow microphone access and try again.');
         } else if (error.message?.includes('401') || error.message?.includes('authorization')) {
           alert('Invalid API key. Please check your ElevenLabs API key and try again.');
+        } else if (error.message?.includes('agent')) {
+          alert('No Conversational AI agent found. Please create an agent in your ElevenLabs dashboard first.');
         } else {
-          alert('Failed to start voice assistant. Please check your API key and try again.');
+          alert('Failed to start voice assistant. Please check your API key and ensure you have created a Conversational AI agent.');
         }
         setIsListening(false);
       }
@@ -171,9 +192,10 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMovieSearch }) => {
               Cancel
             </button>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
-            Your API key is stored locally and never sent to our servers.
-          </p>
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-3">
+            <p>Your API key is stored locally and never sent to our servers.</p>
+            <p className="mt-2 text-red-500">⚠️ You need to create a Conversational AI agent in your ElevenLabs dashboard first!</p>
+          </div>
         </div>
       )}
       
