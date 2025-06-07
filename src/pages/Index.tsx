@@ -4,6 +4,7 @@ import MovieCard from '../components/MovieCard';
 import MovieDetails from '../components/MovieDetails';
 import AIRecommendations from '../components/AIRecommendations';
 import VoiceAssistant from '../components/VoiceAssistant';
+import AIChat from '../components/AIChat';
 import ThemeToggle from '../components/ThemeToggle';
 import { Movie } from '../types/movie';
 import { searchMovies, getMovieByTitle } from '../services/movieService';
@@ -226,6 +227,9 @@ const Index = () => {
           </div>
         </div>
       )}
+
+      {/* AI Chat Assistant */}
+      <AIChat onMovieSearch={handleVoiceSearch} />
 
       {/* Voice Assistant with enhanced styling */}
       <VoiceAssistant onMovieSearch={handleVoiceSearch} />
