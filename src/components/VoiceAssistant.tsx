@@ -1,7 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { useConversation } from '@11labs/react';
+import VoiceAssistantSetup from './VoiceAssistantSetup';
+import VoiceAssistantButton from './VoiceAssistantButton';
+import VoiceAssistantControls from './VoiceAssistantControls';
 
 interface VoiceAssistantProps {
   onMovieSearch?: (query: string) => void;
@@ -177,96 +179,31 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMovieSearch }) => {
   return (
     <div className="fixed bottom-8 right-8 z-50">
       {showApiInput && (
-        <div className="mb-6 p-6 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-purple-200 dark:border-purple-700 rounded-3xl shadow-2xl max-w-sm glow-purple">
-          <h3 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent mb-4">
-            🎤 Voice Assistant Setup
-          </h3>
-          <p className="text-gray-700 dark:text-gray-300 text-sm mb-4">
-            Enter your ElevenLabs credentials:
-          </p>
-          <input
-            type="password"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            placeholder="API Key (sk_...)"
-            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-2xl text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 mb-3"
-          />
-          <input
-            type="text"
-            value={agentId}
-            onChange={(e) => setAgentId(e.target.value)}
-            placeholder="Agent ID"
-            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-2xl text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
-          />
-          <div className="flex gap-3 mt-4">
-            <button
-              onClick={saveApiKey}
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105"
-            >
-              Save
-            </button>
-            <button
-              onClick={() => setShowApiInput(false)}
-              className="flex-1 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-semibold rounded-xl transition-all duration-300"
-            >
-              Cancel
-            </button>
-          </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-3">
-            <p>Your credentials are stored locally and never sent to our servers.</p>
-            <p className="mt-2 text-red-500">⚠️ Create a Conversational AI agent in your ElevenLabs dashboard first!</p>
-            <p className="mt-1 text-blue-500">💡 Find your Agent ID in the ElevenLabs dashboard under Conversational AI.</p>
-          </div>
-        </div>
+        <VoiceAssistantSetup
+          apiKey={apiKey}
+          agentId={agentId}
+          onApiKeyChange={setApiKey}
+          onAgentIdChange={setAgentId}
+          onSave={saveApiKey}
+          onCancel={() => setShowApiInput(false)}
+        />
       )}
       
       <div className="flex flex-col gap-4">
         {/* Mute/Unmute Button */}
         {isListening && (
-          <button
-            onClick={toggleMute}
-            className="p-4 bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 hover:from-amber-500 hover:via-orange-500 hover:to-red-500 text-white rounded-full shadow-xl transition-all duration-300 transform hover:scale-110 glow-pink"
-          >
-            {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
-          </button>
+          <VoiceAssistantControls
+            isMuted={isMuted}
+            onToggleMute={toggleMute}
+          />
         )}
 
         {/* Voice Assistant Button */}
-        <button
+        <VoiceAssistantButton
+          isListening={isListening}
           onClick={toggleListening}
-          className={`relative p-8 rounded-full shadow-2xl transition-all duration-500 transform hover:scale-110 ${
-            isListening
-              ? 'bg-gradient-to-r from-red-500 via-pink-500 to-purple-500 hover:from-red-600 hover:via-pink-600 hover:to-purple-600 animate-pulse glow-pink'
-              : 'bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 glow-purple'
-          }`}
-        >
-          {isListening ? (
-            <MicOff className="w-10 h-10 text-white" />
-          ) : (
-            <Mic className="w-10 h-10 text-white" />
-          )}
-          
-          {/* Listening Indicator */}
-          {isListening && (
-            <>
-              <div className="absolute inset-0 rounded-full border-4 border-white/40 animate-ping"></div>
-              <div className="absolute inset-0 rounded-full border-2 border-white/60 animate-pulse"></div>
-            </>
-          )}
-        </button>
+        />
       </div>
-
-      {/* Status Text */}
-      {isListening && (
-        <div className="absolute bottom-full right-0 mb-6 px-6 py-4 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-purple-200 dark:border-purple-700 rounded-2xl shadow-2xl glow-purple">
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full mr-3 animate-pulse"></div>
-            <p className="text-gray-900 dark:text-white text-sm font-semibold whitespace-nowrap">
-              🎤 Listening... Say "search for [movie name]"
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
