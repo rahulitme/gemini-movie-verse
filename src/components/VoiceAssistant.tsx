@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useConversation } from '@11labs/react';
 import VoiceAssistantSetup from './VoiceAssistantSetup';
@@ -21,6 +20,66 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMovieSearch }) => {
     return localStorage.getItem('elevenlabs_agent_id') || '';
   });
 
+  // Helper function to check if a message should trigger a movie search
+  const shouldTriggerMovieSearch = (messageText: string): boolean => {
+    const lowerMessage = messageText.toLowerCase();
+    
+    // Skip AI support responses
+    const skipPatterns = [
+      'i am sorry',
+      'i cannot fulfill',
+      'i do not have the functionality',
+      'how can i help you',
+      'anything else i can help',
+      'elevenlabs support',
+      'i\'m not familiar with',
+      'could you please clarify'
+    ];
+    
+    if (skipPatterns.some(pattern => lowerMessage.includes(pattern))) {
+      return false;
+    }
+    
+    // Check for movie search intentions
+    const moviePatterns = [
+      /search for (.+)/,
+      /find (.+)/,
+      /show me (.+)/,
+      /look for (.+)/,
+      /movie (.+)/,
+      /film (.+)/,
+      /watch (.+)/,
+      /recommend (.+)/
+    ];
+    
+    return moviePatterns.some(pattern => pattern.test(lowerMessage));
+  };
+
+  // Helper function to extract movie query from user message
+  const extractMovieQuery = (messageText: string): string | null => {
+    const lowerMessage = messageText.toLowerCase();
+    
+    const searchPatterns = [
+      /search for (.+)/,
+      /find (.+)/,
+      /show me (.+)/,
+      /look for (.+)/,
+      /movie (.+)/,
+      /film (.+)/,
+      /watch (.+)/,
+      /recommend (.+)/
+    ];
+    
+    for (const pattern of searchPatterns) {
+      const match = lowerMessage.match(pattern);
+      if (match && match[1]) {
+        return match[1].trim();
+      }
+    }
+    
+    return null;
+  };
+
   const conversation = useConversation({
     onConnect: () => {
       console.log('Voice assistant connected');
@@ -33,39 +92,20 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ onMovieSearch }) => {
     },
     onMessage: (message) => {
       console.log('Voice message received:', message);
+      
       if (message.message && onMovieSearch) {
-        const messageText = message.message.toLowerCase();
+        const messageText = message.message;
         console.log('Processing message:', messageText);
         
-        // Look for movie search patterns
-        const searchPatterns = [
-          /search for (.+)/,
-          /find (.+)/,
-          /show me (.+)/,
-          /look for (.+)/,
-          /movie (.+)/,
-          /film (.+)/
-        ];
-        
-        for (const pattern of searchPatterns) {
-          const match = messageText.match(pattern);
-          if (match && match[1]) {
-            const query = match[1].trim();
-            console.log('Extracted search query:', query);
+        // Only process user messages, not AI responses
+        if (message.source === 'user' && shouldTriggerMovieSearch(messageText)) {
+          const query = extractMovieQuery(messageText);
+          if (query) {
+            console.log('Extracted movie search query:', query);
             onMovieSearch(query);
-            return;
           }
-        }
-        
-        // If no pattern matches, try to use the entire message as a search query
-        // Remove common voice command words
-        const cleanedMessage = messageText
-          .replace(/^(search for|find|show me|look for|movie|film)\s+/i, '')
-          .trim();
-        
-        if (cleanedMessage.length > 2) {
-          console.log('Using cleaned message as search query:', cleanedMessage);
-          onMovieSearch(cleanedMessage);
+        } else if (message.source === 'ai') {
+          console.log('Skipping AI response:', messageText);
         }
       }
     },
