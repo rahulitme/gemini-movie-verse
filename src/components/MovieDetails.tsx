@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Movie } from '../types/movie';
-import { X, Star, Calendar, Clock, Globe, Award, DollarSign, Play, Sparkles } from 'lucide-react';
+import { X, Star, Calendar, Clock, Globe, Award, DollarSign, Sparkles } from 'lucide-react';
 import { analyzeMovie } from '../services/geminiService';
+import MovieTrailer from './MovieTrailer';
 
 interface MovieDetailsProps {
   movie: Movie;
@@ -107,21 +108,10 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie, onClose }) => {
               )}
 
               {/* Trailer */}
-              <div>
-                <h3 className="text-2xl font-bold text-white mb-4">Trailer</h3>
-                <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-                  <iframe
-                    src={`https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(`${movie.Title} official trailer`)}&autoplay=1&rel=0`}
-                    title={`${movie.Title} trailer`}
-                    className="absolute inset-0 w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    loading="eager"
-                  />
-                </div>
-              </div>
+              <MovieTrailer title={movie.Title} />
 
               {/* Genres */}
+
               {movie.Genre && movie.Genre !== 'N/A' && (
                 <div>
                   <h3 className="text-xl font-bold text-white mb-3">Genres</h3>
