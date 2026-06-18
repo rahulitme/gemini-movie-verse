@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Movie } from '../types/movie';
-import { X, Star, Calendar, Clock, Globe, Award, DollarSign, Play, Sparkles } from 'lucide-react';
+import { X, Star, Calendar, Clock, Globe, Award, DollarSign, Sparkles } from 'lucide-react';
 import { analyzeMovie } from '../services/geminiService';
+import MovieTrailer from './MovieTrailer';
 
 interface MovieDetailsProps {
   movie: Movie;
