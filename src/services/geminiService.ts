@@ -93,11 +93,13 @@ export const getRandomRecommendations = async (): Promise<string[]> => {
     });
 
     const data: GeminiResponse = await response.json();
-    const text = data.candidates[0]?.content?.parts[0]?.text || '';
-    
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const cleaned = text.replace(/```json|```/g, '').trim();
+    const match = cleaned.match(/\[[\s\S]*\]/);
+
     try {
-      const recommendations = JSON.parse(text);
-      return Array.isArray(recommendations) ? recommendations : [];
+      const recommendations = JSON.parse(match ? match[0] : cleaned);
+      return Array.isArray(recommendations) ? recommendations : ['The Dark Knight', 'Spirited Away', 'Casablanca', 'Mad Max: Fury Road', 'Parasite', 'The Grand Budapest Hotel'];
     } catch {
       return ['The Dark Knight', 'Spirited Away', 'Casablanca', 'Mad Max: Fury Road', 'Parasite', 'The Grand Budapest Hotel'];
     }
