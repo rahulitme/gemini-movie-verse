@@ -1,6 +1,6 @@
 
 const GEMINI_API_KEY = 'AIzaSyBSJpsfaBZdDjxSAOW868s48KXl-kBVEHE';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
 
 export interface GeminiResponse {
   candidates: {
@@ -31,14 +31,15 @@ export const getMovieRecommendations = async (preferences: string): Promise<stri
     });
 
     const data: GeminiResponse = await response.json();
-    const text = data.candidates[0]?.content?.parts[0]?.text || '';
-    
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const cleaned = text.replace(/```json|```/g, '').trim();
+    const match = cleaned.match(/\[[\s\S]*\]/);
+
     try {
-      const recommendations = JSON.parse(text);
+      const recommendations = JSON.parse(match ? match[0] : cleaned);
       return Array.isArray(recommendations) ? recommendations : [];
     } catch {
-      // If JSON parsing fails, try to extract movie titles from the text
-      const lines = text.split('\n').filter(line => line.trim());
+      const lines = cleaned.split('\n').filter(line => line.trim());
       return lines.slice(0, 6).map(line => line.replace(/^\d+\.\s*/, '').replace(/^["\-\*\s]+/, '').replace(/["\s]+$/, ''));
     }
   } catch (error) {
@@ -66,7 +67,7 @@ export const analyzeMovie = async (movieTitle: string, plot: string): Promise<st
     });
 
     const data: GeminiResponse = await response.json();
-    return data.candidates[0]?.content?.parts[0]?.text || 'Analysis not available.';
+    return data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Analysis not available.';
   } catch (error) {
     console.error('Error analyzing movie:', error);
     return 'Unable to analyze this movie at the moment.';
@@ -92,11 +93,13 @@ export const getRandomRecommendations = async (): Promise<string[]> => {
     });
 
     const data: GeminiResponse = await response.json();
-    const text = data.candidates[0]?.content?.parts[0]?.text || '';
-    
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const cleaned = text.replace(/```json|```/g, '').trim();
+    const match = cleaned.match(/\[[\s\S]*\]/);
+
     try {
-      const recommendations = JSON.parse(text);
-      return Array.isArray(recommendations) ? recommendations : [];
+      const recommendations = JSON.parse(match ? match[0] : cleaned);
+      return Array.isArray(recommendations) ? recommendations : ['The Dark Knight', 'Spirited Away', 'Casablanca', 'Mad Max: Fury Road', 'Parasite', 'The Grand Budapest Hotel'];
     } catch {
       return ['The Dark Knight', 'Spirited Away', 'Casablanca', 'Mad Max: Fury Road', 'Parasite', 'The Grand Budapest Hotel'];
     }
