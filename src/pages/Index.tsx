@@ -95,7 +95,7 @@ const Index = () => {
 
   const handleMovieSelect = async (imdbID: string) => {
     try {
-      const movieDetails = await getMovieByTitle(imdbID);
+      const movieDetails = await getMovieDetails(imdbID);
       if (movieDetails) {
         setSelectedMovie(movieDetails);
       }
