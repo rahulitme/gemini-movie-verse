@@ -67,7 +67,7 @@ export const analyzeMovie = async (movieTitle: string, plot: string): Promise<st
     });
 
     const data: GeminiResponse = await response.json();
-    return data.candidates[0]?.content?.parts[0]?.text || 'Analysis not available.';
+    return data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Analysis not available.';
   } catch (error) {
     console.error('Error analyzing movie:', error);
     return 'Unable to analyze this movie at the moment.';
