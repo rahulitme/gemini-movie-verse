@@ -106,6 +106,21 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ movie, onClose }) => {
                 </div>
               )}
 
+              {/* Trailer */}
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-4">Trailer</h3>
+                <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                  <iframe
+                    src={`https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(`${movie.Title} official trailer`)}&autoplay=1&rel=0`}
+                    title={`${movie.Title} trailer`}
+                    className="absolute inset-0 w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    loading="eager"
+                  />
+                </div>
+              </div>
+
               {/* Genres */}
               {movie.Genre && movie.Genre !== 'N/A' && (
                 <div>
