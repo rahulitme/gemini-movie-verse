@@ -24,13 +24,16 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onClose, onMovieS
 
   const loadRandomRecommendations = async () => {
     setLoading(true);
+    setHasSearched(true);
     try {
       const titles = await getRandomRecommendations();
       const moviePromises = titles.map(title => getMovieByTitle(title));
       const movies = await Promise.all(moviePromises);
-      setRecommendations(movies.filter(movie => movie !== null));
+      const filteredMovies = movies.filter(movie => movie !== null);
+      setRecommendations(filteredMovies);
     } catch (error) {
       console.error('Error loading random recommendations:', error);
+      setRecommendations([]);
     } finally {
       setLoading(false);
     }
@@ -45,9 +48,11 @@ const AIRecommendations: React.FC<AIRecommendationsProps> = ({ onClose, onMovieS
       const titles = await getMovieRecommendations(preferences);
       const moviePromises = titles.map(title => getMovieByTitle(title));
       const movies = await Promise.all(moviePromises);
-      setRecommendations(movies.filter(movie => movie !== null));
+      const filteredMovies = movies.filter(movie => movie !== null);
+      setRecommendations(filteredMovies);
     } catch (error) {
       console.error('Error getting recommendations:', error);
+      setRecommendations([]);
     } finally {
       setLoading(false);
     }
