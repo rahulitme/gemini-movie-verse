@@ -31,14 +31,15 @@ export const getMovieRecommendations = async (preferences: string): Promise<stri
     });
 
     const data: GeminiResponse = await response.json();
-    const text = data.candidates[0]?.content?.parts[0]?.text || '';
-    
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const cleaned = text.replace(/```json|```/g, '').trim();
+    const match = cleaned.match(/\[[\s\S]*\]/);
+
     try {
-      const recommendations = JSON.parse(text);
+      const recommendations = JSON.parse(match ? match[0] : cleaned);
       return Array.isArray(recommendations) ? recommendations : [];
     } catch {
-      // If JSON parsing fails, try to extract movie titles from the text
-      const lines = text.split('\n').filter(line => line.trim());
+      const lines = cleaned.split('\n').filter(line => line.trim());
       return lines.slice(0, 6).map(line => line.replace(/^\d+\.\s*/, '').replace(/^["\-\*\s]+/, '').replace(/["\s]+$/, ''));
     }
   } catch (error) {
