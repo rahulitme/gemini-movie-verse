@@ -7,7 +7,7 @@ import VoiceAssistant from '../components/VoiceAssistant';
 import AIChat from '../components/AIChat';
 import ThemeToggle from '../components/ThemeToggle';
 import { Movie } from '../types/movie';
-import { searchMovies, getMovieByTitle } from '../services/movieService';
+import { searchMovies, getMovieByTitle, getMovieDetails } from '../services/movieService';
 import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
@@ -95,7 +95,7 @@ const Index = () => {
 
   const handleMovieSelect = async (imdbID: string) => {
     try {
-      const movieDetails = await getMovieByTitle(imdbID);
+      const movieDetails = await getMovieDetails(imdbID);
       if (movieDetails) {
         setSelectedMovie(movieDetails);
       }
